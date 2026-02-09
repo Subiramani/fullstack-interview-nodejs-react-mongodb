@@ -54,8 +54,8 @@ export const taskAPI = {
   /**
    * Get all tasks
    */
-  getTasks: async () => {
-    return fetchAPI('/tasks');
+  getTasks: async (page = 1) => {
+    return fetchAPI(`/tasks?page=${page}&limit=10`);
   },
 
   /**

@@ -21,14 +21,39 @@ class TaskService {
    */
   async getAllTasks(filters = {}) {
     const query = {};
-    
+    const options = {};
+
     // Example: filter by completion status if provided
     if (filters.completed !== undefined) {
       query.completed = filters.completed === 'true';
     }
-    
+
+    if (filters.page !== undefined && !isNaN(Number(filters.page))) {
+      let limit = filters.limit ? Number(filters.limit) : 10
+      if (limit > 20) {
+        limit = 10
+      }
+      options.limit = limit;
+      const skipRecords = (Number(filters.page) - 1) * options.limit;
+      if (skipRecords) {
+        options.skip = skipRecords;
+      }
+    }
     // Sort by creation date (newest first)
-    return await Task.find(query).sort({ createdAt: -1 });
+    const tasks = await Task.find(query, null, options).sort({ createdAt: -1 });
+    const count = await Task.countDocuments(query)
+    const currentPage = filters.page ?? 1;
+    const totalPages = Math.ceil(count / filters.limit);
+    const pagination = {
+      currentPage,
+      totalPages,
+      totalItems: count,
+      itemsPerPage: filters.limit,
+      hasNextPage: currentPage < totalPages,
+      hasPrevPage: currentPage > 1
+    }
+
+    return { tasks, pagination }
   }
 
   /**

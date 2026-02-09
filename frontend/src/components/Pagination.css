@@ -1,0 +1,10 @@
+.pagination-wrapper {
+  display: flex;
+  gap: 2;
+  justify-content: center;
+}
+
+.page-button {
+  padding: 10px;
+  margin: 5px;
+}

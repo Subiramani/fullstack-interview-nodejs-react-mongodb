@@ -21,11 +21,10 @@ const taskService = require('../services/taskService');
  */
 exports.getTasks = async (req, res, next) => {
   try {
-    const tasks = await taskService.getAllTasks(req.query);
-    
+    const { tasks, pagination } = await taskService.getAllTasks(req.query);
     res.status(200).json({
       success: true,
-      count: tasks.length,
+      pagination,
       data: tasks
     });
   } catch (error) {

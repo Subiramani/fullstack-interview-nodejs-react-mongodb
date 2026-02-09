@@ -3,6 +3,7 @@ import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import { taskAPI } from '../services/api';
 import './TasksPage.css';
+import Pagination from '../components/Pagination';
 
 /**
  * TasksPage Component
@@ -28,6 +29,15 @@ function TasksPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    itemsPerPage: 0,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
 
   /**
    * Fetch tasks on component mount
@@ -35,7 +45,7 @@ function TasksPage() {
    */
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [currentPage]);
 
   /**
    * Fetch all tasks from API
@@ -44,7 +54,8 @@ function TasksPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await taskAPI.getTasks();
+      const response = await taskAPI.getTasks(currentPage);
+      setPagination(response.pagination);
       setTasks(response.data);
     } catch (err) {
       setError(err.message);
@@ -107,6 +118,10 @@ function TasksPage() {
     }
   };
 
+  const handlePageChange = (updatePage) => {
+    setCurrentPage(updatePage)
+  }
+
   /**
    * Render loading state
    */
@@ -141,6 +156,8 @@ function TasksPage() {
         onToggleComplete={handleToggleComplete}
         onDelete={handleDeleteTask}
       />
+
+      <Pagination {...pagination} onPageChange={handlePageChange}/>
     </div>
   );
 }
